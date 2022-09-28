@@ -1,2 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿
+using AdressBook.Services;
+
+IMenuService menu = new MenuService();
+
+do
+{
+    menu.MainMenu();
+}
+while (true);
