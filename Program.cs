@@ -1,7 +1,7 @@
 ﻿
 using AdressBook.Services;
 
-IMenuService menu = new MenuService();
+IMenuService menu = new MenuService($@"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\contacts.json");
 
 do
 {

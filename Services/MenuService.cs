@@ -22,12 +22,23 @@ namespace AdressBook.Services
 
     internal class MenuService : IMenuService
     {
-        private IFileService _fileService = new FileService($@"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\contacts.json"); // kanske ändra?
+        //private IFileService _fileService = new FileService($@"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\contacts.json"); // kanske ändra?
+        private IFileService _fileService;
         private static List<Contact> _contacts = new List<Contact>();
 
+        public MenuService(string filePath)
+        {
+            _fileService = new FileService(filePath);
+            try
+            {
+                _contacts = _fileService.Read();
+            }
+            catch
+            {
+                _contacts = new List<Contact>();
+            }
 
-
-        //Jag hämtar inte contacts från filen
+        }
 
         public void MainMenu()
         {
@@ -79,17 +90,16 @@ namespace AdressBook.Services
             contact.FirstName = Console.ReadLine().Trim();
             Console.Write("Last name: ");
             contact.LastName = Console.ReadLine().Trim();
-            Console.Write("Phonenumber: ");
+            Console.Write("Phone number: ");
             contact.Phone = Console.ReadLine().Trim();
             Console.Write("E-mail: ");
             contact.Email = Console.ReadLine().Trim();
             _contacts.Add(contact);
             _fileService.Save(_contacts);
-            Console.WriteLine("Contact added.");
-            /*
+            Console.WriteLine("Contact added.");            
             Console.ReadKey();
-            MainMenu();
-            */
+            
+            
         }
 
         public void DeleteContact(Guid id)
@@ -104,12 +114,13 @@ namespace AdressBook.Services
 
         
 
-        public void ShowContacts()
+        public  void ShowContacts()
         {
-            //_contacts = _fileService.Read();            
+                    
 
             Console.Clear();
 
+            /*
             try
             {
                 _contacts = _fileService.Read();
@@ -118,44 +129,52 @@ namespace AdressBook.Services
             {
                 Console.WriteLine("No Contacts Found.");
                 Console.ReadKey();
-                MainMenu();
+                //MainMenu();
             }
+            */
 
-
-            foreach (Contact contact in _contacts)
-            {
-                Console.WriteLine($"{_contacts.IndexOf(contact) + 1}. {contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email} - - {contact.Id}");
-
-
-                // stoppa in index och id i en array som stoppas in i en lista
-                //eller: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.keyvaluepair-2?view=net-6.0
-            }
-            Console.Write("Enter number to see details or M to go back to Main Menu: ");
-
-            var show = Console.ReadLine();
-
-            if(show.ToLower() == "m")
-            {
-                MainMenu();
-            }
-            else 
+            if(_contacts.Count() != 0)
             { 
-                try
+                foreach (Contact contact in _contacts)
                 {
-                    ShowContact(Int32.Parse(show) - 1);
-                }
-                catch
-                {
+                    Console.WriteLine($"{_contacts.IndexOf(contact) + 1}. {contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");// - - {contact.Id}
 
+                    
+                    //eller: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.keyvaluepair-2?view=net-6.0
                 }
+                Console.Write("Enter number to see details or M to go back to Main Menu: ");
+
+                var show = Console.ReadLine();
+
+                if(show.ToLower() == "m")
+                {
+                    MainMenu();
+                }
+                else 
+                { 
+                    try
+                    {
+                        ShowContact(Int32.Parse(show) - 1);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Invalid choice.");
+                        Console.ReadKey();
+                    }
+                }
+                
+                // Int32 show = Int32.Parse(Console.ReadLine()) - 1;
+
+                // Console.Write(_contacts[show].FirstName);
+               // ShowContact(show);
+
+                //Console.ReadKey();
             }
-            
-            // Int32 show = Int32.Parse(Console.ReadLine()) - 1;
-
-            // Console.Write(_contacts[show].FirstName);
-            ShowContact(show);
-
-            Console.ReadKey();
+            else
+            {
+                Console.WriteLine("No contacts found.");
+                Console.ReadKey();
+            }
         }
 
         public void SearchContact()
