@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -13,7 +12,7 @@ namespace AdressBook.Services
     {
         public void MainMenu();
         public void CreateContact();
-        //public void ShowContacts();
+        public void ShowContacts();
         public void SearchContact();
         //public void ShowContact(string name); // använd polymorphism? https://www.w3schools.com/cs/cs_polymorphism.php
         //public void ShowContact(Int32 index);  // dessa två kanske interna och inte med i interface
@@ -36,7 +35,7 @@ namespace AdressBook.Services
             }
             catch
             {
-                
+                _contacts = new List<Contact>();
             }
 
         }
@@ -59,7 +58,7 @@ namespace AdressBook.Services
             switch (option)
             {
                 case "1":
-                    ShowContacts(_contacts);
+                    ShowContacts();
                     break;
                 case "2":
                     SearchContact();
@@ -106,9 +105,6 @@ namespace AdressBook.Services
         public void DeleteContact(Guid id)
         {
             throw new NotImplementedException();
-
-
-            // _contacts.RemoveAt(<index>);
         }
 
         public void EditContact(Guid id)
@@ -118,18 +114,33 @@ namespace AdressBook.Services
 
         
 
-        public void ShowContacts(List<Contact>  contacts)
-        {                  
+        public  void ShowContacts()
+        {
+                    
 
             Console.Clear();
 
-            if(contacts.Count() != 0)
-            { 
-                foreach (Contact contact in contacts)
-                {
-                    Console.WriteLine($"{contacts.IndexOf(contact) + 1}. {contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");// - - {contact.Id}
+            /*
+            try
+            {
+                _contacts = _fileService.Read();
+            }
+            catch
+            {
+                Console.WriteLine("No Contacts Found.");
+                Console.ReadKey();
+                //MainMenu();
+            }
+            */
 
-                    // Kanske inte visa allt detta
+            if(_contacts.Count() != 0)
+            { 
+                foreach (Contact contact in _contacts)
+                {
+                    Console.WriteLine($"{_contacts.IndexOf(contact) + 1}. {contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");// - - {contact.Id}
+
+                    
+                    //eller: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.keyvaluepair-2?view=net-6.0
                 }
                 Console.Write("Enter number to see details or M to go back to Main Menu: ");
 
@@ -150,7 +161,14 @@ namespace AdressBook.Services
                         Console.WriteLine("Invalid choice.");
                         Console.ReadKey();
                     }
-                }                
+                }
+                
+                // Int32 show = Int32.Parse(Console.ReadLine()) - 1;
+
+                // Console.Write(_contacts[show].FirstName);
+               // ShowContact(show);
+
+                //Console.ReadKey();
             }
             else
             {
@@ -161,57 +179,19 @@ namespace AdressBook.Services
 
         public void SearchContact()
         {
-            Console.Clear();
-            Console.Write("Enter first name or last name of the contact you are looking for: ");
-            string searchName = Console.ReadLine().ToLower();
-            Console.Clear();
-            List<Int32> results = new();
-            foreach (Contact contact in _contacts)
-            {
-                
-                if (contact.FirstName.ToLower() == searchName || contact.LastName.ToLower() == searchName)
-                {
-                    results.Add(_contacts.IndexOf(contact));
-                    //ShowContact(_contacts.IndexOf(contact));
-                }                
-            }
-
-            if (results.Count == 1)
-            {
-                ShowContact(results[0]);
-            }
-            else
-            {
-                ShowContacts(results);
-            }
-            
-            Console.ReadKey();
-
-            /*
-            foreach (Contact contact in _contacts)
-            {
-                if (contact.FirstName.ToLower() == searchName || contact.LastName.ToLower() == searchName)
-                {
-                    Console.WriteLine($"{contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");
-                }
-            }
-            Console.ReadKey();
-            */
+            throw new NotImplementedException();
         }
-/*
-        public void ShowContact(Contact)
+
+        public void ShowContact(string name)
         {
-            //Console.Clear();
-            //Contact contact = _contacts[index];
-            Console.WriteLine($"{contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");
+            Console.Write(name);
         }
-*/
         public void ShowContact(Int32 index)
         {
-            //Console.Clear();
+            Console.Clear();
             Contact contact = _contacts[index];
             Console.WriteLine($"{contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");
-            //Console.ReadKey();
+            Console.ReadKey();
         }
 
         

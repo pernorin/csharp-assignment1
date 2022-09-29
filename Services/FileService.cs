@@ -26,12 +26,25 @@ namespace AdressBook.Services
         public List<Contact> Read()
         {
             var contacts = new List<Contact>();
+
             
             using var sr = new StreamReader(_filePath);
             contacts = JsonConvert.DeserializeObject<List<Contact>>(sr.ReadToEnd());
 
-            return contacts;           
+            return contacts;
             
+            /*
+            try
+            {
+                using var sr = new StreamReader(_filePath);
+                contacts = JsonConvert.DeserializeObject<List<Contact>>(sr.ReadToEnd());
+            }
+            catch
+            {
+                
+            }
+            return contacts;
+            */
         }
         public void Save(List<Contact> contacts)
         {
