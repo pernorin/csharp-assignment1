@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -14,15 +15,11 @@ namespace AdressBook.Services
         public void CreateContact();
         public void ShowContacts();
         public void SearchContact();
-        //public void ShowContact(string name); // använd polymorphism? https://www.w3schools.com/cs/cs_polymorphism.php
-        //public void ShowContact(Int32 index);  // dessa två kanske interna och inte med i interface
-        //public void EditContact(Guid id);
-        //public void DeleteContact(Guid id);
+        
     }
 
     internal class MenuService : IMenuService
     {
-        //private IFileService _fileService = new FileService($@"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\contacts.json"); // kanske ändra?
         private IFileService _fileService;
         private static List<Contact> _contacts = new List<Contact>();
 
@@ -37,13 +34,10 @@ namespace AdressBook.Services
             {
                 _contacts = new List<Contact>();
             }
-
         }
 
         public void MainMenu()
         {
-
-
             Console.Clear();
 
             Console.WriteLine("---  Contact List  ---");
@@ -76,7 +70,6 @@ namespace AdressBook.Services
                     Console.WriteLine("Invalid option. Choose again.");
                     break;
             }
-
         }
 
         public void CreateContact()
@@ -97,50 +90,19 @@ namespace AdressBook.Services
             _contacts.Add(contact);
             _fileService.Save(_contacts);
             Console.WriteLine("Contact added.");            
-            Console.ReadKey();
-            
-            
+            Console.ReadKey();            
         }
-
-        public void DeleteContact(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EditContact(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        
 
         public  void ShowContacts()
         {
-                    
-
             Console.Clear();
-
-            /*
-            try
-            {
-                _contacts = _fileService.Read();
-            }
-            catch
-            {
-                Console.WriteLine("No Contacts Found.");
-                Console.ReadKey();
-                //MainMenu();
-            }
-            */
 
             if(_contacts.Count() != 0)
             { 
                 foreach (Contact contact in _contacts)
                 {
-                    Console.WriteLine($"{_contacts.IndexOf(contact) + 1}. {contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");// - - {contact.Id}
+                    Console.WriteLine($"{_contacts.IndexOf(contact) + 1}. {contact.FirstName} {contact.LastName}");// - {contact.Phone} - {contact.Email} - - {contact.Id}
 
-                    
-                    //eller: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.keyvaluepair-2?view=net-6.0
                 }
                 Console.Write("Enter number to see details or M to go back to Main Menu: ");
 
@@ -151,7 +113,8 @@ namespace AdressBook.Services
                     MainMenu();
                 }
                 else 
-                { 
+                {
+                    Console.Clear();
                     try
                     {
                         ShowContact(Int32.Parse(show) - 1);
@@ -161,14 +124,7 @@ namespace AdressBook.Services
                         Console.WriteLine("Invalid choice.");
                         Console.ReadKey();
                     }
-                }
-                
-                // Int32 show = Int32.Parse(Console.ReadLine()) - 1;
-
-                // Console.Write(_contacts[show].FirstName);
-               // ShowContact(show);
-
-                //Console.ReadKey();
+                }                
             }
             else
             {
@@ -179,28 +135,71 @@ namespace AdressBook.Services
 
         public void SearchContact()
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            Console.Write("Enter first name or last name of the contact you are looking for: ");
+            string searchName = Console.ReadLine().ToLower();
+            Console.Clear();
+
+            foreach (Contact contact in _contacts)
+            {
+                if (contact.FirstName.ToLower() == searchName || contact.LastName.ToLower() == searchName)
+                {
+                    ShowContact(_contacts.IndexOf(contact));
+                }
+            }    //om inget namn hittas går det tillbaka till mainMenu
         }
 
-        public void ShowContact(string name)
-        {
-            Console.Write(name);
-        }
         public void ShowContact(Int32 index)
         {
-            Console.Clear();
+            
             Contact contact = _contacts[index];
+            Console.WriteLine();
             Console.WriteLine($"{contact.FirstName} {contact.LastName} - {contact.Phone} - {contact.Email}");
-            Console.ReadKey();
+            Console.WriteLine("------------------------------------------------------");
+            Console.WriteLine("To edit contact press E \nTo delete contact press D \nor press enter to continue.");
+            string option = Console.ReadLine().ToLower(); 
+
+            switch(option)
+            {
+                case "e":
+                    EditContact(ref contact);
+                    break;
+                case "d":
+                    DeleteContact(contact.Id);
+                    break;
+                default:
+                    break;
+            }
         }
 
-        
+        public void DeleteContact(Guid id)
+        {
+            _contacts = _contacts.Where(c => c.Id != id).ToList();
+            _fileService.Save(_contacts);
+            Console.WriteLine("Contact deleted.");
+            Console.ReadKey();
+            MainMenu();
+        }
 
+        public void EditContact(ref Contact contact)
+        {
+            Console.WriteLine();
+            Console.Write("Enter new first name (or press enter to keep current name): ");
+            string firstName = Console.ReadLine().Trim();
+            contact.FirstName = (firstName != "") ? firstName : contact.FirstName;
+            Console.Write("Enter new last name (or press enter to keep current name): ");
+            string lastName = Console.ReadLine().Trim();
+            contact.LastName = (lastName != "") ? lastName : contact.LastName;
+            Console.Write("Enter new phone number (or press enter to keep current number): ");
+            string phone = Console.ReadLine().Trim();
+            contact.Phone = (phone != "") ? phone : contact.Phone;
+            Console.Write("Enter new E-mail (or press enter to keep current address): ");
+            string eMail = Console.ReadLine().Trim();
+            contact.Email = (eMail != "") ? eMail : contact.Email;
 
-        // main menu
-        // create contact menu
-        // view all menu
-        // view one menu -> delete/edit - menu   -ska kunna kallas från view all och search
-        // search menu  -search metod: overload där en tar in int från view all och en tar in string från search
+            _fileService.Save(_contacts);
+            MainMenu();
+
+        }
     }
 }
