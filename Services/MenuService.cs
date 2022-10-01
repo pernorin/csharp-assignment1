@@ -14,8 +14,7 @@ namespace AdressBook.Services
         public void MainMenu();
         public void CreateContact();
         public void ShowContacts();
-        public void SearchContact();
-        
+        public void SearchContact();        
     }
 
     internal class MenuService : IMenuService
@@ -161,7 +160,7 @@ namespace AdressBook.Services
             switch(option) // Om anv. väljer att redigera eller radera kontakten körs respektive metod,...
             {
                 case "e":
-                    EditContact(ref contact);
+                    EditContact(contact);
                     break;
                 case "d":
                     DeleteContact(contact.Id);
@@ -180,8 +179,8 @@ namespace AdressBook.Services
             MainMenu();
         }
 
-        public void EditContact(ref Contact contact) // En referens till kontakten skickas in istället för själva kontakten,
-        {                                            // så att vi inte behöver skriva över hela kontakten med en kopia
+        public void EditContact(Contact contact) // Kontakten skickas in som argument och anv. får redigera delarna en efter en
+        {                                            
             Console.WriteLine();
             Console.Write("Enter new first name (or press enter to keep current name): ");  
             string firstName = Console.ReadLine().Trim();

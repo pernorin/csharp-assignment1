@@ -30,8 +30,7 @@ namespace AdressBook.Services
             using var sr = new StreamReader(_filePath);
             contacts = JsonConvert.DeserializeObject<List<Contact>>(sr.ReadToEnd());
 
-            return contacts;
-           
+            return contacts;           
         }
         public void Save(List<Contact> contacts) // En metod som sparar listan contacts till en fil
         {
